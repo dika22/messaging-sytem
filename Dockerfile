@@ -1,18 +1,24 @@
 FROM golang:1.23-alpine AS builder
 
 WORKDIR /app
+
+# Copy go.mod dan go.sum
 COPY go.mod go.sum ./
 RUN go mod download
 
+# Copy source code
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main cmd/server/main.go
 
-FROM alpine:latest
-RUN apk --no-cache add ca-certificates
-WORKDIR /root/
+# Build binary
+RUN go build -o main .
+
+# Run stage (slim image)
+FROM debian:bookworm-slim
+
+WORKDIR /app
 
 COPY --from=builder /app/main .
-COPY --from=builder /app/config ./config
-COPY --from=builder /app/migrations ./migrations
 
-CMD ["./main"]
+EXPOSE 3000
+
+CMD ["./main", "serve-http"]
