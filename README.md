@@ -55,7 +55,7 @@ docker-compose up postgres rabbitmq -d
 
 3. Run the application:
 ```bash
-make run
+make serve-http
 ```
 
 ## API Usage
@@ -203,51 +203,6 @@ CREATE TABLE messages (
 - Completes ongoing message processing
 - Closes database and RabbitMQ connections cleanly
 
-## Production Considerations
-
-### Monitoring
-
-The application exposes standard HTTP endpoints for health checks:
-
-```bash
-curl http://localhost:8080/health
-```
-
-For production monitoring, consider adding:
-- Prometheus metrics for queue depth, processing times
-- Structured logging with correlation IDs
-- Distributed tracing support
-
-### Security
-
-- JWT authentication middleware (implement as needed)
-- Rate limiting per tenant
-- Input validation and sanitization
-- Database connection pooling
-- TLS for all external connections
-
-### Scalability
-
-- Horizontal scaling with multiple application instances
-- RabbitMQ clustering for high availability
-- PostgreSQL read replicas for query scaling
-- Consider event sourcing for audit trails
-
-## Development
-
-### Available Make Commands
-
-```bash
-make help          # Show all available commands
-make build         # Build the application binary
-make run           # Run locally
-make test          # Run unit tests
-make docker        # Build Docker image  
-make docker-up     # Start with Docker Compose
-make docker-down   # Stop Docker services
-make swagger       # Generate API documentation
-make lint          # Run code linter
-```
 
 ## Troubleshooting
 
@@ -265,7 +220,3 @@ Application logs include:
 - Message processing status
 - Error details with stack traces
 - Performance metrics
-
-## License
-
-MIT License - see LICENSE file for details.
