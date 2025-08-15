@@ -1,0 +1,16 @@
+rabbitmq:
+  url: "amqp://guest:guest@localhost:5672/"
+  
+database:
+  url: "postgres://adhika:adhika@localhost:5432/messaging_system?sslmode=disable"
+  
+server:
+  port: "8080"
+  
+workers: 3
+
+logging:
+  level: "info"
+
+jwt:
+  secret: "your-secret-key"

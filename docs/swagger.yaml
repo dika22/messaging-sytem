@@ -1,0 +1,235 @@
+definitions:
+  structs.CreateMessageRequest:
+    properties:
+      payload:
+        additionalProperties: true
+        type: object
+      tenant_id:
+        type: string
+    required:
+    - payload
+    - tenant_id
+    type: object
+  structs.CreateTenantRequest:
+    properties:
+      concurrency_config:
+        type: integer
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  structs.Response:
+    properties:
+      message:
+        type: string
+      result: {}
+      status:
+        type: boolean
+      status_code:
+        type: integer
+    type: object
+  structs.Tenant:
+    properties:
+      concurrency_config:
+        type: integer
+      created_at:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  structs.UpdateConcurrencyRequest:
+    properties:
+      workers:
+        minimum: 1
+        type: integer
+    required:
+    - workers
+    type: object
+info:
+  contact: {}
+paths:
+  /messages:
+    get:
+      description: Get messages for a tenant with cursor-based pagination
+      parameters:
+      - description: Tenant ID
+        in: query
+        name: tenant_id
+        required: true
+        type: string
+      - description: Cursor for pagination
+        in: query
+        name: cursor
+        type: string
+      - default: 10
+        description: Limit number of results
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.Response'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get messages with cursor pagination
+      tags:
+      - messages
+    post:
+      consumes:
+      - application/json
+      description: Publish a message to a tenant's queue
+      parameters:
+      - description: Message data
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/structs.CreateMessageRequest'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/structs.Response'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Publish a message
+      tags:
+      - messages
+  /tenants:
+    post:
+      consumes:
+      - application/json
+      description: Create a new tenant with dedicated queue and consumer
+      parameters:
+      - description: Tenant data
+        in: body
+        name: tenant
+        required: true
+        schema:
+          $ref: '#/definitions/structs.CreateTenantRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/structs.Tenant'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new tenant
+      tags:
+      - tenants
+  /tenants/{id}:
+    delete:
+      description: Delete tenant and stop its consumer
+      parameters:
+      - description: Tenant ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete tenant
+      tags:
+      - tenants
+  /tenants/{id}/config/concurrency:
+    put:
+      consumes:
+      - application/json
+      description: Update the number of concurrent workers for a tenant
+      parameters:
+      - description: Tenant ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Concurrency config
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/structs.UpdateConcurrencyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.Response'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update tenant concurrency
+      tags:
+      - tenants
+swagger: "2.0"
