@@ -18,6 +18,8 @@ FROM debian:bookworm-slim
 WORKDIR /app
 
 COPY --from=builder /app/main .
+COPY --from=builder /app/package/config ./config
+COPY --from=builder /app/migrations ./migrations
 
 EXPOSE 3000
 

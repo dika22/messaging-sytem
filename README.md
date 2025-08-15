@@ -58,10 +58,6 @@ make serve-http
 ```bash
 make docker-up
 ```
-. Start the services:
-```bash
-make docker-up
-```
 
 ## API Usage
 
