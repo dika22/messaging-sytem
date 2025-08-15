@@ -31,7 +31,7 @@ services:
       - postgres
       - rabbitmq
     environment:
-      - CONFIG_PATH=config/config.yaml
+      - CONFIG_PATH=package/config/config.yaml
     volumes:
       - ./config:/root/config
       - ./migrations:/root/migrations
