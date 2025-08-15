@@ -23,7 +23,7 @@ A production-ready Go application that implements a multi-tenant messaging syste
 - Docker & Docker Compose
 - Make (optional, for convenience commands)
 
-### Running with Docker Compose
+### Running Locally
 
 1. Clone the repository:
 ```bash
@@ -31,31 +31,36 @@ git clone <repository-url>
 cd messaging-system
 ```
 
-2. Start the services:
-```bash
-make docker-up
-```
-
-3. The application will be available at:
-   - API: http://localhost:8080
-   - Swagger UI: http://localhost:8080/swagger/index.html
-   - RabbitMQ Management: http://localhost:15672 (guest/guest)
-
-### Running Locally
-
-1. Install dependencies:
+2. Install dependencies:
 ```bash
 make deps
 ```
 
-2. Start PostgreSQL and RabbitMQ:
+3. Start PostgreSQL and RabbitMQ:
 ```bash
 docker-compose up postgres rabbitmq -d
 ```
 
-3. Run the application:
+4. Run the application:
 ```bash
 make serve-http
+```
+
+5. The application will be available at:
+   - API: http://localhost:8080
+   - Swagger UI: http://localhost:8080/swagger/index.html
+   - RabbitMQ Management: http://localhost:15672 (guest/guest)
+
+
+### Running with Docker Compose
+
+1. Start the services:
+```bash
+make docker-up
+```
+. Start the services:
+```bash
+make docker-up
 ```
 
 ## API Usage
@@ -172,51 +177,3 @@ CREATE TABLE messages (
 -- Individual partitions are created automatically:
 -- messages_tenant_{tenant_id} PARTITION OF messages FOR VALUES IN ('{tenant_id}')
 ```
-
-## Architecture Details
-
-### Tenant Manager
-
-- Manages tenant lifecycle and associated consumers
-- Creates/deletes RabbitMQ queues dynamically  
-- Maintains worker pools with configurable concurrency
-- Handles graceful shutdown of all consumers
-
-### Consumer Management
-
-- Each tenant gets a dedicated RabbitMQ queue: `tenant_{id}_queue`
-- Consumers use worker pools to process messages concurrently
-- Worker count can be updated dynamically via API
-- Failed messages are requeued for retry
-
-### Database Partitioning
-
-- Messages table is partitioned by `tenant_id`
-- Each tenant gets a separate partition for data isolation
-- Improves query performance and enables tenant-specific operations
-- Partitions are automatically created/dropped with tenants
-
-### Graceful Shutdown
-
-- Handles SIGINT/SIGTERM signals
-- Stops all tenant consumers gracefully
-- Completes ongoing message processing
-- Closes database and RabbitMQ connections cleanly
-
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Database connection failed**: Ensure PostgreSQL is running and connection string is correct
-2. **RabbitMQ connection failed**: Check RabbitMQ service status and credentials
-3. **Partition creation failed**: Verify database permissions for DDL operations
-4. **Consumer not processing messages**: Check RabbitMQ queue status and worker pool configuration
-
-### Logs
-
-Application logs include:
-- Consumer startup/shutdown events
-- Message processing status
-- Error details with stack traces
-- Performance metrics
