@@ -25,6 +25,7 @@ services:
 
   app:
     build: .
+    command: ./main serve-http
     ports:
       - "8080:8080"
     depends_on:
@@ -35,6 +36,8 @@ services:
     volumes:
       - ./config:/root/config
       - ./migrations:/root/migrations
+      - ./package/config/config.yaml:/app/package/config/config.yaml
+
 
 volumes:
   postgres_data:
