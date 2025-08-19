@@ -12,7 +12,6 @@ A production-ready Go application that implements a multi-tenant messaging syste
 - **Cursor Pagination**: Efficient pagination for message retrieval
 - **Swagger Documentation**: Complete API documentation with interactive UI
 - **Integration Tests**: Comprehensive tests using Docker containers
-- **Production Ready**: Includes Docker, monitoring hooks, and proper error handling
 
 
 ## Quick Start
